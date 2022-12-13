@@ -42,7 +42,7 @@ const onInput = async event => {
     dropdown.classList.add('is-active'); // показываем выпадающее меню
     
     // выводим найденные данные
-    movies.forEach(movie => {
+    movies.forEach( movie => {
         const option = document.createElement('a');
         option.classList.add('dropdown-item');
 
@@ -51,11 +51,13 @@ const onInput = async event => {
             <h1>${movie.Title}</h1>
         `;
         
-        resultsWrapper.insertAdjacentElement('beforeend', option);
+        resultsWrapper.insertAdjacentElement('beforeend', option); // размещаем элемент в документе 
 
-        // если нажали на кино, скрываем выпадающее меню
-        option.addEventListener('click', event => {
-            dropdown.classList.remove('is-active');
+        option.addEventListener('click', () => { // если нажали на кино
+            dropdown.classList.remove('is-active'); // скрываем выпадающее меню
+            input.value = movie.Title; // пишем в input название фильма
+
+            onMovieSelect(movie); // получение данных о выбранном фильме
         });
     });
 }
@@ -68,3 +70,13 @@ document.addEventListener('click', event => {
         dropdown.classList.remove('is-active');// закрываем выпадающий список
     }
 });
+
+const onMovieSelect = async movie => {
+    const response = await axios.get('http://www.omdbapi.com/', {
+        params:{
+           apikey: 'e74fe266',
+           i: movie.imdbID
+        }
+    });
+    console.log(response.data);
+};
