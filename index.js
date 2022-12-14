@@ -1,22 +1,3 @@
-/**
- * получение данных от API по данным из поиска
- */
-const fetchData = async (searchTerm) => {
-    const response = await axios.get('http://www.omdbapi.com/', {
-        params:{
-           apikey: 'e74fe266',
-           s: searchTerm
-        }
-    });
-    if(response.data.Error){
-        return [];
-    }
-    return response.data.Search;
-}
-
-/**
- * создаем элемент поиска, вешаем обработчик события
- */
 createAutoComplete({
     root: document.querySelector('.autocomplete'),
     renderOption(movie){
@@ -24,6 +5,24 @@ createAutoComplete({
             <img src="${movie.Poster === 'N/A' ? '' : movie.Poster}">
             <h1>${movie.Title} (${movie.Year})</h1>
         `;
+    },
+    onOptionSelect(movie){
+        onMovieSelect(movie);
+    },
+    inputValue(movie){
+        return movie.Title;
+    },
+    async fetchData(searchTerm){
+        const response = await axios.get('http://www.omdbapi.com/', {
+            params:{
+                apikey: 'e74fe266',
+                s: searchTerm
+            }
+        });
+        if(response.data.Error){
+            return [];
+        }
+        return response.data.Search;
     }
 });
 
@@ -35,7 +34,7 @@ const onMovieSelect = async movie => {
            i: movie.imdbID
         }
     });
-    
+
     // выводим в документ сформированную разметку
     document.getElementById('summary').innerHTML = movieTemplate(response.data);
 };

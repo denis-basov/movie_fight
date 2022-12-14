@@ -1,8 +1,8 @@
-const createAutoComplete = ({ root, renderOption }) => {
+const createAutoComplete = ({ root, renderOption, onOptionSelect, inputValue, fetchData }) => {
 
     // root - свойство из объекта конфигурации, которое содержит в значении элемент для вставки данных
     root.innerHTML = `
-        <label><b>Search for a movie</b></label>
+        <label><b>Search</b></label>
         <input class="input">
         <div class="dropdown">
             <div class="dropdown-menu">
@@ -19,30 +19,31 @@ const createAutoComplete = ({ root, renderOption }) => {
      * при вводе данных в поле поиска
      */
     const onInput = async event => {
-        const movies = await fetchData(event.target.value); // получаем данные о фильмах
-        if (!movies.length) { // если данных нет
+        const items = await fetchData(event.target.value); // получаем данные о фильмах
+
+        if (!items.length) { // если данных нет
             dropdown.classList.remove('is-active'); // убираем выпадающее меню
             return;
         }
-        resultsWrapper.innerHTML = ''; // удаляем контент предыдужего запроса
+        resultsWrapper.innerHTML = ''; // удаляем контент предыдущего запроса
         dropdown.classList.add('is-active'); // показываем выпадающее меню
         
         // перебираем массив с найденными фильмами
-        movies.forEach( movie => {
+        items.forEach( item => {
             const option = document.createElement('a'); // создаем ссылку
             option.classList.add('dropdown-item'); // добавляем класс
 
             // формируем внутреннее содержимое ссылки
-            option.innerHTML = renderOption(movie);
-            
-            resultsWrapper.insertAdjacentElement('beforeend', option); // размещаем элемент в документе 
+            option.innerHTML = renderOption(item);
+
+            resultsWrapper.insertAdjacentElement('beforeend', option); // размещаем элемент в документе
 
             // добавляем обработчик события на каждую ссылку
             option.addEventListener('click', () => { // если нажали на кино
                 dropdown.classList.remove('is-active'); // скрываем выпадающее меню
-                input.value = movie.Title; // пишем в input название фильма
+                input.value = inputValue(item); // пишем в input название фильма
 
-                onMovieSelect(movie); // получаем и выводим в документ данные о выбранном фильме
+                onOptionSelect(item); // получаем и выводим в документ данные о выбранном фильме
             });
         });
     }
@@ -57,4 +58,4 @@ const createAutoComplete = ({ root, renderOption }) => {
         }
     });
 
-};
+}; // jsonplaceholder.typicode.com
