@@ -1,23 +1,20 @@
 /**
- * получение данных от API
+ * получение данных от API по данным из поиска
  */
 const fetchData = async (searchTerm) => {
-
     const response = await axios.get('http://www.omdbapi.com/', {
         params:{
            apikey: 'e74fe266',
            s: searchTerm
         }
     });
-
     if(response.data.Error){
         return [];
     }
     return response.data.Search;
-
 }
 
-const root = document.querySelector('.autocomplete');
+const root = document.querySelector('.autocomplete'); // элемент для вставки элементов поиска
 root.innerHTML = `
     <label><b>Search for a movie</b></label>
     <input class="input">
@@ -28,24 +25,29 @@ root.innerHTML = `
     </div>
 `;
 
-const input = document.querySelector('input');// получаем инпут
-const dropdown = document.querySelector('.dropdown');
-const resultsWrapper = document.querySelector('.results');
+const input = document.querySelector('input');// получаем элемент, куда вводятся данные
+const dropdown = document.querySelector('.dropdown'); // выпадающее меню
+const resultsWrapper = document.querySelector('.results'); // блок для вывода результатов
   
+
+/**
+ * при вводе данных в поле поиска
+ */
 const onInput = async event => {
-    const movies = await fetchData(event.target.value); // получаем данные
-    if (!movies.length) {
-        dropdown.classList.remove('is-active');
+    const movies = await fetchData(event.target.value); // получаем данные о фильмах
+    if (!movies.length) { // если данных нет
+        dropdown.classList.remove('is-active'); // убираем выпадающее меню
         return;
     }
     resultsWrapper.innerHTML = ''; // удаляем контент предыдужего запроса
     dropdown.classList.add('is-active'); // показываем выпадающее меню
     
-    // выводим найденные данные
+    // перебираем массив с найденными фильмами
     movies.forEach( movie => {
-        const option = document.createElement('a');
-        option.classList.add('dropdown-item');
+        const option = document.createElement('a'); // создаем ссылку
+        option.classList.add('dropdown-item'); // добавляем класс
 
+        // формируем внутреннее содержимое ссылки
         option.innerHTML = `
             <img src="${movie.Poster === 'N/A' ? '' : movie.Poster}">
             <h1>${movie.Title}</h1>
@@ -53,15 +55,17 @@ const onInput = async event => {
         
         resultsWrapper.insertAdjacentElement('beforeend', option); // размещаем элемент в документе 
 
+        // добавляем обработчик события на каждую ссылку
         option.addEventListener('click', () => { // если нажали на кино
             dropdown.classList.remove('is-active'); // скрываем выпадающее меню
             input.value = movie.Title; // пишем в input название фильма
 
-            onMovieSelect(movie); // получение данных о выбранном фильме
+            onMovieSelect(movie); // получаем и выводим в документ данные о выбранном фильме
         });
     });
 }
 
+// вешаем обработчик на поле поиска
 input.addEventListener('input', debounce(onInput, 1000));
 
 // если кликнули в любое другое место на странице кроме элемента <div class="autocomplete">
@@ -79,7 +83,8 @@ const onMovieSelect = async movie => {
            i: movie.imdbID
         }
     });
-    console.log(response.data);
+    
+    // выводим в документ сформированную разметку
     document.getElementById('summary').innerHTML = movieTemplate(response.data);
 };
 
