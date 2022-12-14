@@ -14,64 +14,16 @@ const fetchData = async (searchTerm) => {
     return response.data.Search;
 }
 
-const root = document.querySelector('.autocomplete'); // элемент для вставки элементов поиска
-root.innerHTML = `
-    <label><b>Search for a movie</b></label>
-    <input class="input">
-    <div class="dropdown">
-        <div class="dropdown-menu">
-            <div class="dropdown-content results"></div>
-        </div>
-    </div>
-`;
-
-const input = document.querySelector('input');// получаем элемент, куда вводятся данные
-const dropdown = document.querySelector('.dropdown'); // выпадающее меню
-const resultsWrapper = document.querySelector('.results'); // блок для вывода результатов
-  
-
 /**
- * при вводе данных в поле поиска
+ * создаем элемент поиска, вешаем обработчик события
  */
-const onInput = async event => {
-    const movies = await fetchData(event.target.value); // получаем данные о фильмах
-    if (!movies.length) { // если данных нет
-        dropdown.classList.remove('is-active'); // убираем выпадающее меню
-        return;
-    }
-    resultsWrapper.innerHTML = ''; // удаляем контент предыдужего запроса
-    dropdown.classList.add('is-active'); // показываем выпадающее меню
-    
-    // перебираем массив с найденными фильмами
-    movies.forEach( movie => {
-        const option = document.createElement('a'); // создаем ссылку
-        option.classList.add('dropdown-item'); // добавляем класс
-
-        // формируем внутреннее содержимое ссылки
-        option.innerHTML = `
+createAutoComplete({
+    root: document.querySelector('.autocomplete'),
+    renderOption(movie){
+        return `
             <img src="${movie.Poster === 'N/A' ? '' : movie.Poster}">
-            <h1>${movie.Title}</h1>
+            <h1>${movie.Title} (${movie.Year})</h1>
         `;
-        
-        resultsWrapper.insertAdjacentElement('beforeend', option); // размещаем элемент в документе 
-
-        // добавляем обработчик события на каждую ссылку
-        option.addEventListener('click', () => { // если нажали на кино
-            dropdown.classList.remove('is-active'); // скрываем выпадающее меню
-            input.value = movie.Title; // пишем в input название фильма
-
-            onMovieSelect(movie); // получаем и выводим в документ данные о выбранном фильме
-        });
-    });
-}
-
-// вешаем обработчик на поле поиска
-input.addEventListener('input', debounce(onInput, 1000));
-
-// если кликнули в любое другое место на странице кроме элемента <div class="autocomplete">
-document.addEventListener('click', event => {
-    if (!root.contains(event.target)) {
-        dropdown.classList.remove('is-active');// закрываем выпадающий список
     }
 });
 
