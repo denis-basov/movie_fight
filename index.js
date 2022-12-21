@@ -1,47 +1,56 @@
-createAutoComplete({
-    root: document.querySelector('.autocomplete'),
-    renderOption(movie){
-        return `
-            <img src="${movie.Poster === 'N/A' ? '' : movie.Poster}">
-            <h1>${movie.Title} (${movie.Year})</h1>
-        `;
-    },
-    onOptionSelect(movie){
-        onMovieSelect(movie);
-    },
-    inputValue(movie){
-        return movie.Title;
-    },
-    async fetchData(searchTerm){
-        const response = await axios.get('http://www.omdbapi.com/', {
-            params:{
-                apikey: 'e74fe266',
-                s: searchTerm
-            }
-        });
-        if(response.data.Error){
-            return [];
-        }
-        return response.data.Search;
+const autoCompleteConfig = {
+  renderOption(movie) {
+    return `
+        <img src="${movie.Poster === "N/A" ? "" : movie.Poster}">
+        <h1>${movie.Title} (${movie.Year})</h1>
+    `;
+  },
+  onOptionSelect(movie) {
+    onMovieSelect(movie);
+  },
+  inputValue(movie) {
+    return movie.Title;
+  },
+  async fetchData(searchTerm) {
+    const response = await axios.get("http://www.omdbapi.com/", {
+      params: {
+        apikey: "e74fe266",
+        s: searchTerm,
+      },
+    });
+    if (response.data.Error) {
+      return [];
     }
+    return response.data.Search;
+  },
+};
+
+createAutoComplete({
+  ...autoCompleteConfig,
+  root: document.querySelector("#left-autocomplete"),
+});
+
+createAutoComplete({
+  ...autoCompleteConfig,
+  root: document.querySelector("#right-autocomplete"),
 });
 
 // получаем данные об одном фильме
-const onMovieSelect = async movie => {
-    const response = await axios.get('http://www.omdbapi.com/', {
-        params:{
-           apikey: 'e74fe266',
-           i: movie.imdbID
-        }
-    });
+const onMovieSelect = async (movie) => {
+  const response = await axios.get("http://www.omdbapi.com/", {
+    params: {
+      apikey: "e74fe266",
+      i: movie.imdbID,
+    },
+  });
 
-    // выводим в документ сформированную разметку
-    document.getElementById('summary').innerHTML = movieTemplate(response.data);
+  // выводим в документ сформированную разметку
+  document.getElementById("summary").innerHTML = movieTemplate(response.data);
 };
 
 // формируем разметку
-const movieTemplate = movieDetail => {
-    return `
+const movieTemplate = (movieDetail) => {
+  return `
         <article class="media">
             <figure class="media-left">
             <p class="image">

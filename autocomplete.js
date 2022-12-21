@@ -1,14 +1,13 @@
 const createAutoComplete = ({ root, renderOption, onOptionSelect, inputValue, fetchData }) => {
-  // root - свойство из объекта конфигурации, которое содержит в значении элемент для вставки данных
   root.innerHTML = `
-        <label><b>Search</b></label>
-        <input class="input">
-        <div class="dropdown">
-            <div class="dropdown-menu">
-                <div class="dropdown-content results"></div>
-            </div>
-        </div>
-    `;
+  <label><b>Search</b></label>
+  <input class="input" />
+  <div class="dropdown">
+    <div class="dropdown-menu">
+      <div class="dropdown-content results"></div>
+    </div>
+  </div>
+`;
 
   const input = root.querySelector("input"); // получаем элемент, куда вводятся данные
   const dropdown = root.querySelector(".dropdown"); // выпадающее меню
