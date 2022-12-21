@@ -5,9 +5,6 @@ const autoCompleteConfig = {
         <h1>${movie.Title} (${movie.Year})</h1>
     `;
   },
-  onOptionSelect(movie) {
-    onMovieSelect(movie);
-  },
   inputValue(movie) {
     return movie.Title;
   },
@@ -28,15 +25,23 @@ const autoCompleteConfig = {
 createAutoComplete({
   ...autoCompleteConfig,
   root: document.querySelector("#left-autocomplete"),
+  onOptionSelect(movie) {
+    document.querySelector(".tutorial").classList.add("is-hidden");
+    onMovieSelect(movie, "left-summary");
+  },
 });
 
 createAutoComplete({
   ...autoCompleteConfig,
   root: document.querySelector("#right-autocomplete"),
+  onOptionSelect(movie) {
+    document.querySelector(".tutorial").classList.add("is-hidden");
+    onMovieSelect(movie, "right-summary");
+  },
 });
 
 // получаем данные об одном фильме
-const onMovieSelect = async (movie) => {
+const onMovieSelect = async (movie, summaryId) => {
   const response = await axios.get("http://www.omdbapi.com/", {
     params: {
       apikey: "e74fe266",
@@ -45,7 +50,7 @@ const onMovieSelect = async (movie) => {
   });
 
   // выводим в документ сформированную разметку
-  document.getElementById("summary").innerHTML = movieTemplate(response.data);
+  document.getElementById(summaryId).innerHTML = movieTemplate(response.data);
 };
 
 // формируем разметку
